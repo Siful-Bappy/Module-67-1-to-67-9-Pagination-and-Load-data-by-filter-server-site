@@ -1,6 +1,6 @@
 const express = require('express')
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const app = express()
 const port = process.env.PORT || 5000;
@@ -51,6 +51,17 @@ async function run() {
           // const count = await cursor.count();
           // because we are sending as string
           res.send({count});
+        })
+
+        //use post to get product by id
+        app.post("/productByKeys", async(req, res) => {
+          const keys = req.body;
+          const ids = keys.map(id => ObjectId(id));
+          const query = {_id: {$in: ids}};
+          const cursor = productCollection.find(query);
+          const products = await cursor.toArray();
+          res.send(products);
+          console.log(keys);
         })
     }
     finally{
